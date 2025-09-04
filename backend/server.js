@@ -14,7 +14,7 @@ app.use(express.json());
 // ✅ Allow multiple origins
 const allowedOrigins = [
   "http://localhost:3000",                  // local
-  "https://auth-login-logout-sqlite-5uis.vercel.app/"    // vercel deployed frontend
+  "https://auth-login-logout.vercel.app/"    // vercel deployed frontend
 ];
 
 app.use(
