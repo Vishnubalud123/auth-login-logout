@@ -10,12 +10,26 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
+
+// ✅ Allow multiple origins
+const allowedOrigins = [
+  "http://localhost:3000",                  // local
+  "https://auth-login-logout-sqlite-5uis.vercel.app/"    // vercel deployed frontend
+];
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_ORIGIN || "http://localhost:3000",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS: " + origin));
+      }
+    },
     credentials: true,
   })
 );
+
 app.use(
   session({
     name: "session",
@@ -50,7 +64,6 @@ app.post("/api/auth/register", (req, res) => {
     const hashed = bcrypt.hashSync(password, 10);
     db.run("INSERT INTO users (email, password) VALUES (?, ?)", [email, hashed], function (err) {
       if (err) return res.status(500).json({ message: "Error creating user" });
-      // set session
       req.session.userId = this.lastID;
       res.status(201).json({ user: { id: this.lastID, email } });
     });
